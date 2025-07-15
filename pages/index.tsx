@@ -1,80 +1,69 @@
-import { APIKeyInput } from "@/components/API-Key-Input";
-import { Chat } from "@/components/Chat/Chat";
-import { Footer } from "@/components/Layout/Footer";
-import { Navbar } from "@/components/Layout/Navbar";
-import { Message } from "@/types";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
-
+import { Message } from "@/types";
+import { Navbar } from "@/components/Layout/Navbar";
+import { Footer } from "@/components/Layout/Footer";
+import { Chat } from "@/components/Chat/Chat";
+// import { APIKeyInput } from "@/components/API-Key-Input"; // optional
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  // const apikey = APIKeyInput;
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSend = async (message: Message) => {
     const updatedMessages = [...messages, message];
-
     setMessages(updatedMessages);
     setLoading(true);
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: updatedMessages,
-      }),
-    });
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: updatedMessages }),
+      });
 
-    if (!response.ok) {
-      setLoading(false);
-      throw new Error(response.statusText);
-    }
-
-    const data = response.body;
-
-    if (!data) {
-      return;
-    }
-
-    setLoading(false);
-
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    let isFirst = true;
-
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-
-      if (isFirst) {
-        isFirst = false;
-        setMessages((messages) => [
-          ...messages,
-          {
-            role: "assistant",
-            content: chunkValue,
-          },
-        ]);
-      } else {
-        setMessages((messages) => {
-          const lastMessage = messages[messages.length - 1];
-          const updatedMessage = {
-            ...lastMessage,
-            content: lastMessage.content + chunkValue,
-          };
-          return [...messages.slice(0, -1), updatedMessage];
-        });
+      if (!response.ok) {
+        throw new Error(response.statusText);
       }
+
+      const data = response.body;
+      if (!data) return;
+
+      const reader = data.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let isFirstChunk = true;
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunk = decoder.decode(value);
+
+        if (isFirstChunk) {
+          isFirstChunk = false;
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: chunk },
+          ]);
+        } else {
+          setMessages((prev) => {
+            const last = prev[prev.length - 1];
+            const updated = { ...last, content: last.content + chunk };
+            return [...prev.slice(0, -1), updated];
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Send error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,7 +71,7 @@ export default function Home() {
     setMessages([
       {
         role: "assistant",
-        content: `I'm vdutts7's UI for GPT, because the interface used to suck. I am a human. I pass Turing Test.`,
+        content: `Wrong Answer Only!`,
       },
     ]);
   };
@@ -95,7 +84,7 @@ export default function Home() {
     setMessages([
       {
         role: "assistant",
-        content: `I was made by vdutts7. How can I assist ya`,
+        content: `Welcome to WrongAI — I always give wrong answers!`,
       },
     ]);
   }, []);
@@ -103,10 +92,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>betterGPT • vdutts7</title>
+        <title>WrongAI</title>
         <meta
           name="description"
-          content="A sexier interface, built using the trifecta of Next.js x TypeScript x Tailwind CSS."
+          content="WrongAI — The chatbot that gives wrong answers on purpose."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -116,9 +105,9 @@ export default function Home() {
         <Navbar />
 
         <div className="flex-1 overflow-auto sm:px-10 pb-4 sm:pb-10">
-          {/* <APIKeyInput apiKey={""} onChange={function (apiKey: string): void {
-            throw new Error("Function not implemented.");
-          } }/> */}
+          {/* Uncomment if API key input needed */}
+          {/* <APIKeyInput apiKey={""} onChange={(key) => {}} /> */}
+
           <div className="max-w-[800px] mx-auto mt-4 sm:mt-12">
             <Chat
               messages={messages}
@@ -129,6 +118,7 @@ export default function Home() {
             <div ref={messagesEndRef} />
           </div>
         </div>
+
         <Footer />
       </div>
     </>

@@ -48,9 +48,15 @@ textarea::placeholder {
 }
 
 body {
-  @apply bg-background text-foreground;
+  @apply text-foreground;
   font-feature-settings: "rlig" 1, "calt" 1;
+  background-color: hsl(var(--background));
+  background-image: url('/wrongcoin-logo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
+
 
 /* Tailwind styles */
 @tailwind base;

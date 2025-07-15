@@ -6,16 +6,16 @@ export const Footer: FC = () => {
         Made by 
         <span className="ml-1">
           <a
-            href="https://twitter.com/vdutts7"
+            href="https://x.com/The_WrongCoin/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-rose-300 hover:font-bold"
+            className="text-yellow-300 hover:font-bold"
           >
-            @vdutts7. 
+            WrongCoin. 
           </a>
         </span>
-          Access the source code
-          <a href="https://github.com/vdutts7/betterGPT" target="_blank" rel="noopener noreferrer" className="text-rose-300  
+          Community Join
+          <a href="https://www.thewrongcoin.vip/" target="_blank" rel="noopener noreferrer" className="text-yellow-300  
           hover:font-bold"> here.</a>
       </p>
     </div>;

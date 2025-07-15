@@ -12,7 +12,7 @@ export const OpenAIStream = async (messages: Message[]) => {
     },
     method: "POST",
     body: JSON.stringify({
-      model: OpenAIModel.DAVINCI_TURBO,
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -22,13 +22,15 @@ export const OpenAIStream = async (messages: Message[]) => {
       ],
       max_tokens: 800,
       temperature: 0.0,
-      stream: true
+      stream: true // asli true
     })
   });
 
-  if (res.status !== 200) {
-    throw new Error("OpenAI API returned an error");
-  }
+  if (!res.ok) {
+  const errorBody = await res.text();
+  console.error("OpenAI API error:", errorBody);
+  throw new Error(`OpenAI API returned an error: ${res.status} ${res.statusText}`);
+}
 
   const stream = new ReadableStream({
     async start(controller) {

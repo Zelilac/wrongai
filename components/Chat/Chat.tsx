@@ -17,9 +17,9 @@ export const Chat: FC<Props> = ({ messages, loading, onSend, onReset }) => {
     <>
       <div className="flex flex-row justify-between items-center mb-4 sm:mb-8">
         <h1 className="font-bold text-2xl sm:text-3xl">
-          GPT looks{" "}
-          <span className="bg-gradient-to-br from-rose-500 to-gray-100 text-transparent bg-clip-text">
-            better.
+          {" "}
+          <span className="bg-gradient-to-br from-yellow-500 to-gray-100 text-transparent bg-clip-text">
+            WrongAI
           </span>
         </h1>
         <ResetChat onReset={onReset} />
